@@ -1,118 +1,191 @@
-import Image from "next/image";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
+import Hero from "@/components/hero.component";
+import { useEffect, useState, useRef } from "react";
+import { fetchBreeds, fetchCatImageById } from "./api/get-cats";
+import { fetchDogBreeds, fetchDogImageById } from "./api/dogs";
+import ChoosePet from "@/components/choose-pet.component";
+import CardList from "@/components/card-list.component";
 
 export default function Home() {
+  const choosePetRef = useRef(null);
+  const cardListRef = useRef(null);
+  const [pet, setPet] = useState("");
+  const [catBreeds, setCatBreeds] = useState([]);
+  const [catImages, setCatImages] = useState({});
+  const [visibleCatBreeds, setVisibleCatBreeds] = useState(4);
+  const [dogBreeds, setDogBreeds] = useState([]);
+  const [dogImages, setDogImages] = useState({});
+  const [visibleDogBreeds, setVisibleDogBreeds] = useState(4);
+
+  const getCatBreeds = async () => {
+    const breeds = await fetchBreeds();
+    setCatBreeds(breeds);
+  };
+
+  const getCatImages = async () => {
+    for (let breed of catBreeds) {
+      if (breed.reference_image_id) {
+        const image = await fetchCatImageById(breed.reference_image_id);
+        setCatImages((prevImages) => ({
+          ...prevImages,
+          [breed.id]: image?.url || "",
+        }));
+      }
+    }
+  };
+
+  const getDogBreeds = async () => {
+    const breeds = await fetchDogBreeds();
+    setDogBreeds(breeds);
+  };
+
+  const getDogImages = async () => {
+    for (let breed of dogBreeds) {
+      if (breed.reference_image_id) {
+        const image = await fetchDogImageById(breed.reference_image_id);
+        setDogImages((prevImages) => ({
+          ...prevImages,
+          [breed.id]: image?.url || "",
+        }));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (pet === "cat" && catBreeds.length === 0) {
+      getCatBreeds();
+    }
+  }, [pet, dogBreeds]);
+
+  useEffect(() => {
+    if (pet === "dog" && dogBreeds.length === 0) {
+      getDogBreeds();
+    }
+  }, [pet, dogBreeds]);
+
+  useEffect(() => {
+    if (catBreeds.length > 0) {
+      getCatImages();
+    }
+  }, [catBreeds]);
+
+  useEffect(() => {
+    if (dogBreeds.length > 0) {
+      getDogImages();
+    }
+  }, [dogBreeds]);
+
+  useEffect(() => {
+    if (pet) {
+      if (cardListRef.current) {
+        setTimeout(
+          () => cardListRef.current.scrollIntoView({ behavior: "smooth" }),
+          1000
+        );
+      }
+    }
+  }, [pet, catBreeds, dogBreeds]);
+
+  const handleScrollToChoosePet = () => {
+    choosePetRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleLoadMoreCats = () => {
+    setVisibleCatBreeds((prev) => prev + 8);
+  };
+
+  const handleLoadMoreDogs = () => {
+    setVisibleDogBreeds((prev) => prev + 8);
+  };
+
+  const handleChooseCat = () => {
+    setVisibleCatBreeds(4);
+    setPet("cat");
+  };
+
+  const handleChooseDog = () => {
+    setVisibleDogBreeds(4);
+    setPet("dog");
+  };
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <>
+      <Hero onBtnClick={handleScrollToChoosePet} />
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+      {/* Dog or Cat ? */}
+      <ChoosePet
+        componentRef={choosePetRef}
+        handleChooseCat={handleChooseCat}
+        handleChooseDog={handleChooseDog}
+      />
+      {/* Сat */}
+      {pet === "cat" && (
+        <CardList
+          componentRef={cardListRef}
+          title="Looking for a Cat?"
+          subtitle="Let's find out who is your future Mr. or Mrs. Meowster"
+          breeds={catBreeds}
+          visibleBreeds={visibleCatBreeds}
+          images={catImages}
+          handleLoadMorePets={handleLoadMoreCats}
         />
+      )}
+
+      {/* Dog */}
+      {pet === "dog" && (
+        <CardList
+          componentRef={cardListRef}
+          title="Looking for a Dog?"
+          subtitle="Let's find out who is your future Mr. or Mrs. Woofster"
+          breeds={dogBreeds}
+          visibleBreeds={visibleDogBreeds}
+          images={dogImages}
+          handleLoadMorePets={handleLoadMoreDogs}
+        />
+      )}
+
+      {/* <h2 className="text-center text-[48px] text-yellow-500 tracking-[1px]">
+        Looking for a Cat?
+      </h2>
+      <p className="mt-[12px] text-[24px] text-center mb-[50px]">
+        Let's find out who is your future Mr. or Mrs. Meowster
+      </p>
+      <div className="grid grid-cols-4 px-[80px] gap-[30px]">
+        {catBreeds.slice(0, visibleCatBreeds).map((cat) => (
+          <Card key={cat.id} name={cat.name} image={catImages[cat.id]} />
+        ))}
       </div>
+      {visibleCatBreeds < catBreeds.length && (
+        <div className="flex justify-center mt-8 mb-[100px]">
+          <button
+            onClick={handleLoadMoreCats}
+            className="bg-yellow-500 text-white py-[12px] px-[64px] rounded-full mt-[30px]"
+          >
+            Load More
+          </button>
+        </div>
+      )} */}
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      {/* <h2 className="text-center text-[48px] text-yellow-500 tracking-[1px]">
+        Looking for a Dog?
+      </h2>
+      <p className="mt-[12px] text-[24px] text-center mb-[50px]">
+        Let's find out who is your future Mr. or Mrs. Woofster
+      </p>
+      <div className="grid grid-cols-4 px-[80px] gap-[30px]">
+        {dogBreeds.slice(0, visibleDogBreeds).map((dog) => (
+          <Card key={dog.id} name={dog.name} image={dogImages[dog.id]} />
+        ))}
       </div>
-    </main>
+      {visibleDogBreeds < dogBreeds.length && (
+        <div className="flex justify-center mt-8 mb-[100px]">
+          <button
+            onClick={handleLoadMoreDogs}
+            className="bg-yellow-500 text-white py-[12px] px-[64px] rounded-full mt-[30px]"
+          >
+            Load More
+          </button>
+        </div>
+      )} */}
+    </>
   );
 }
