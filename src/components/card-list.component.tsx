@@ -8,6 +8,7 @@ const CardList = ({
   images,
   handleLoadMorePets,
   componentRef,
+  petType,
 }) => {
   return (
     <div ref={componentRef} className="px-[80px] my-[100px]">
@@ -17,7 +18,13 @@ const CardList = ({
       <p className="mt-[12px] text-[24px] text-center mb-[50px]">{subtitle}</p>
       <div className="grid grid-cols-4 gap-[30px]">
         {breeds.slice(0, visibleBreeds).map((pet) => (
-          <Card key={pet.id} name={pet.name} image={images[pet.id]} />
+          <Card
+            pet={petType}
+            id={pet.id}
+            key={pet.id}
+            name={pet.name}
+            image={images[pet.id]}
+          />
         ))}
       </div>
       {visibleBreeds < breeds.length && (

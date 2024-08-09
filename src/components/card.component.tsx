@@ -1,13 +1,17 @@
 import Image from "next/image";
+import Link from "next/link";
 
-const Card = ({ name, image }) => {
+const Card = ({ id, name, image, pet }) => {
   return (
-    <div className="w-full rounded-[20px] bg-neutral-100 shadow-lg">
+    <Link
+      href={`${pet}/${id}`}
+      className="block w-full rounded-[20px] bg-neutral-100 shadow-lg"
+    >
       <Image
         alt={name}
         src={image}
-        width={100}
-        height={100}
+        width={1000}
+        height={1000}
         className="w-full rounded-t-[20px] object-cover h-[200px]"
       />
       <div className="rounded-[20px] flex flex-col justify-end items-center p-[20px]">
@@ -15,7 +19,7 @@ const Card = ({ name, image }) => {
           {name}
         </p>
       </div>
-    </div>
+    </Link>
   );
 };
 

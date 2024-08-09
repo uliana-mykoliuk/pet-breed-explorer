@@ -8,6 +8,8 @@ const ChoosePetBtn = ({ img, handleChoosePet, pet, text }) => {
       <Image
         src={img}
         alt={pet}
+        width={1000}
+        height={1000}
         className="w-[300px] h-[300px] object-cover rounded-full"
       />
       <p className="text-green-900 tracking-[1px] text-center mt-[30px] max-w-[450px] font-normal">

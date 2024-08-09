@@ -1,6 +1,6 @@
 import Hero from "@/components/hero.component";
 import { useEffect, useState, useRef } from "react";
-import { fetchBreeds, fetchCatImageById } from "./api/get-cats";
+import { fetchBreeds, fetchCatImageById } from "./api/cats";
 import { fetchDogBreeds, fetchDogImageById } from "./api/dogs";
 import ChoosePet from "@/components/choose-pet.component";
 import CardList from "@/components/card-list.component";
@@ -127,6 +127,7 @@ export default function Home() {
           visibleBreeds={visibleCatBreeds}
           images={catImages}
           handleLoadMorePets={handleLoadMoreCats}
+          petType={pet}
         />
       )}
 
@@ -140,6 +141,7 @@ export default function Home() {
           visibleBreeds={visibleDogBreeds}
           images={dogImages}
           handleLoadMorePets={handleLoadMoreDogs}
+          petType={pet}
         />
       )}
 
