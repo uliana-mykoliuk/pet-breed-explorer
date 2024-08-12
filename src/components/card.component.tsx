@@ -1,21 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
+import ImageNotFound from "@/assets/image-not-found.png";
 
-const Card = ({ id, name, image, pet }) => {
+interface CardProps {
+  id: string;
+  name: string;
+  image?: string;
+  pet: string;
+}
+
+const Card: React.FC<CardProps> = ({
+  id,
+  name,
+  image = ImageNotFound,
+  pet,
+}) => {
   return (
     <Link
       href={`${pet}/${id}`}
-      className="block w-full rounded-[20px] bg-neutral-100 shadow-lg"
+      className="block w-full rounded-2xl bg-neutral-100 shadow-lg focus:outline-none"
     >
       <Image
-        alt={name}
+        alt={image === ImageNotFound ? "Image not available" : name}
         src={image}
         width={1000}
         height={1000}
-        className="w-full rounded-t-[20px] object-cover h-[200px]"
+        className="w-full h-36 md:h-48 object-cover rounded-t-2xl"
       />
-      <div className="rounded-[20px] flex flex-col justify-end items-center p-[20px]">
-        <p className="text-green-900 tracking-[1px] text-[18px] font-bold text-center">
+      <div className="flex flex-col items-center justify-end p-3 md:p-5 rounded-2xl">
+        <p className="text-base md:text-lg font-bold text-center text-green-900 tracking-wide">
           {name}
         </p>
       </div>
