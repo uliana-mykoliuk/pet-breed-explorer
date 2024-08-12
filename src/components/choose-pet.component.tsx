@@ -1,52 +1,68 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import CatImg from "@/assets/cat-choise.jpg";
 import DogImg from "@/assets/dog-choise.jpg";
 
-const ChoosePetBtn = ({ img, handleChoosePet, pet, text }) => {
+interface ChoosePetBtnProps {
+  img: StaticImageData;
+  handleChoosePet: () => void;
+  pet: string;
+  text: string;
+}
+
+const ChoosePetBtn: React.FC<ChoosePetBtnProps> = ({
+  img,
+  handleChoosePet,
+  pet,
+  text,
+}) => {
   return (
     <button onClick={handleChoosePet} className="grid justify-items-center">
       <Image
         src={img}
         alt={pet}
-        width={1000}
-        height={1000}
-        className="w-[300px] h-[300px] object-cover rounded-full"
+        className="w-32 h-32 md:w-40 md:h-40 xl:w-80 xl:h-80 object-cover rounded-full"
       />
-      <p className="text-green-900 tracking-[1px] text-center mt-[30px] max-w-[450px] font-normal">
+      <p className="mt-3 md:mt-6 text-sm md:text-base font-normal text-center text-green-900 tracking-wide max-w-[450px]">
         {text}
       </p>
     </button>
   );
 };
 
-const ChoosePet = ({ handleChooseCat, handleChooseDog, componentRef }) => {
+interface ChoosePetProps {
+  handleChooseCat: () => void;
+  handleChooseDog: () => void;
+  componentRef: React.RefObject<HTMLDivElement>;
+}
+
+const ChoosePet: React.FC<ChoosePetProps> = ({
+  handleChooseCat,
+  handleChooseDog,
+  componentRef,
+}) => {
   return (
     <div
       ref={componentRef}
-      className="px-[80px] py-[50px] min-h-screen flex flex-col justify-center"
+      className="min-h-screen flex flex-col justify-center py-12 px-6 sm:px-12 md:px-24"
     >
-      <h2 className="text-center text-[48px] text-yellow-500 tracking-[1px]">
-        Are you Cat or Dog person?
+      <h2 className="text-center text-3xl md:text-5xl text-yellow-500 tracking-wide">
+        Are you a Cat or Dog person?
       </h2>
-      <p className="mt-[12px] text-[18px] text-center mb-[50px]">
+      <p className="mt-3 text-base md:text-lg text-center mb-5 md:mb-12">
         Find your perfect match! Choose your side
       </p>
-      <div className="grid grid-cols-2 gap-x-[50px]">
+      <div className="grid sm:grid-cols-2 gap-y-5 md:gap-y-8 gap-x-8 md:gap-x-12">
         <ChoosePetBtn
           img={CatImg}
           handleChoosePet={handleChooseCat}
           pet="cat"
-          text="Imagine a tiny, furry ninja at home—pouncing on invisible foes,
-            mastering acrobatic leaps, and napping on your keyboard, all with a
-            perfect blend of grace and goofiness!"
+          text="Imagine a tiny, furry ninja at home—pouncing on invisible foes, mastering acrobatic leaps, and napping on your keyboard, all with a perfect blend of grace and goofiness!"
         />
         <ChoosePetBtn
           img={DogImg}
           handleChoosePet={handleChooseDog}
           pet="dog"
-          text="Imagine a joyful, four-legged shadow — always ready to turn a walk
-            into an adventure, greet you with a wagging tail, and brighten your
-            day with a goofy grin. Dogs make every moment more fun!"
+          text="Imagine a joyful, four-legged shadow — always ready to turn a walk into an adventure, greet you with a wagging tail, and brighten your day with a goofy grin. Dogs make every moment more fun!"
         />
       </div>
     </div>

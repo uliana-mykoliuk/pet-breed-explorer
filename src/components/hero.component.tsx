@@ -7,7 +7,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onBtnClick }) => {
   return (
-    <main className="flex items-center min-h-screen bg-neutral-50 py-12 px-6 sm:px-12 md:px-24">
+    <main className="flex items-center min-h-screen bg-neutral-50 py-6 py-12 px-6 sm:px-12 md:px-24">
       <div className="flex flex-col items-center md:flex-row">
         <Image
           src={HeroDogBg}
