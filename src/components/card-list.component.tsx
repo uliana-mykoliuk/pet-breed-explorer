@@ -48,14 +48,14 @@ const CardList: React.FC<CardListProps> = ({
         {visibleBreeds < breeds.length && (
           <button
             onClick={handleLoadMorePets}
-            className="px-8 py-1.5 mt-4 text-white bg-yellow-500 rounded-full md:px-16 md:py-3 md:mt-8"
+            className="duration-500 ease font-rowdies px-8 py-1.5 mt-4 text-white bg-yellow-500 hover:bg-yellow-700 focus:bg-yellow-700 rounded-full md:px-16 md:py-3 md:mt-8"
           >
             Load More
           </button>
         )}
         <button
           onClick={() => handleChangePet(petType === "cat" ? "dog" : "cat")}
-          className="px-8 py-1.5 mt-4 text-white bg-neutral-400 rounded-full md:px-16 md:py-3 md:mt-8 ml-3"
+          className="duration-500 ease font-rowdies px-8 py-1.5 mt-4 bg-green-200 hover:bg-green-900 hover:text-white focus:bg-green-900 focus:text-white rounded-full md:px-16 md:py-3 md:mt-8 ml-3"
         >
           Looking for a {petType === "cat" ? "dog" : "cat"}?
         </button>

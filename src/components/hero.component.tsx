@@ -27,7 +27,7 @@ const Hero: React.FC<HeroProps> = ({ onBtnClick }) => {
           </p>
           <button
             onClick={onBtnClick}
-            className="mt-4 rounded-full bg-yellow-500 text-white text-sm py-1.5 px-4 md:mt-8 md:text-base md:py-3 md:px-6"
+            className="duration-500 ease hover:bg-yellow-700 focus:bg-yellow-700 font-rowdies mt-4 rounded-full bg-yellow-500 text-white text-sm py-1.5 px-4 md:mt-8 md:text-base md:py-3 md:px-6"
           >
             Let's have a look
           </button>

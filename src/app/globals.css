@@ -15,7 +15,10 @@ h2,
 h3,
 h4,
 h5,
-h6,
-button {
+h6 {
+  font-family: "Rowdies", sans-serif;
+}
+
+.font-rowdies {
   font-family: "Rowdies", sans-serif;
 }

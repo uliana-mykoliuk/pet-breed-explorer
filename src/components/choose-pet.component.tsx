@@ -16,14 +16,20 @@ const ChoosePetBtn: React.FC<ChoosePetBtnProps> = ({
   text,
 }) => {
   return (
-    <button onClick={handleChoosePet} className="grid justify-items-center">
+    <button
+      onClick={handleChoosePet}
+      className="grid justify-items-center transform transition-transform duration-500 ease hover:scale-125 focus:scale-125 grayscale-[75%] hover:grayscale-0 focus:grayscale-0"
+    >
       <Image
         src={img}
         alt={pet}
-        className="w-32 h-32 md:w-40 md:h-40 xl:w-80 xl:h-80 object-cover rounded-full"
+        className="w-32 h-32 md:w-40 md:h-40  object-cover rounded-full"
       />
-      <p className="mt-3 md:mt-6 text-sm md:text-base font-normal text-center text-green-900 tracking-wide max-w-[450px]">
+      <p className="mt-3 md:mt-6 text-sm md:text-base font-medium text-center text-green-900 tracking-wide max-w-[450px]">
         {text}
+      </p>
+      <p className="mt-2 md:mt-4 text-sm md:text-base font-rowdies text-center text-yellow-500">
+        Click Me!
       </p>
     </button>
   );
