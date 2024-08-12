@@ -2,19 +2,37 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchDogBreedById, fetchDogImageById } from "@/api/dogs";
-import { DogBreed } from "@/types";
+import {
+  fetchDogBreedById,
+  fetchDogImageById,
+  fetchDogImagesByBreedId,
+} from "@/api/dogs";
+import { CatImage, DogBreed } from "@/types";
+import Modal from "@/components/modal.component";
 
-const DogBreedPage = ({ params }: { params: { id: string } }) => {
+interface DogBreedPageProps {
+  params: {
+    id: string;
+  };
+}
+
+const DogBreedPage = ({ params }: DogBreedPageProps) => {
   const { id } = params;
   const [breed, setBreed] = useState<DogBreed | null>(null);
   const [image, setImage] = useState<string | null>(null);
+  const [gallery, setGallery] = useState<CatImage[] | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const getBreedData = async () => {
     if (id && typeof id === "string") {
       try {
         const breedData = await fetchDogBreedById(id);
         setBreed(breedData);
+
+        if (breedData?.id) {
+          const imagesData = await fetchDogImagesByBreedId(breedData.id);
+          setGallery(imagesData);
+        }
 
         if (breedData?.reference_image_id) {
           const imageData = await fetchDogImageById(
@@ -101,8 +119,36 @@ const DogBreedPage = ({ params }: { params: { id: string } }) => {
               {breed.temperament}
             </p>
           )}
+
+          {gallery && (
+            <>
+              <p className="text-sm md:text-base mt-4 font-bold text-green-900">
+                Gallery:{" "}
+              </p>
+              <div className="flex flex-wrap mt-2 overflow-x-auto">
+                {gallery.map((picture) => (
+                  <button
+                    key={picture.id}
+                    onClick={() => setSelectedImage(picture.url)}
+                    className="mr-2 mb-2"
+                  >
+                    <Image
+                      src={picture.url}
+                      alt={"Cat Image"}
+                      width={picture.width}
+                      height={picture.height}
+                      className="w-[100px] h-[100px] object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
+      {selectedImage && (
+        <Modal image={selectedImage} onClose={() => setSelectedImage(null)} />
+      )}
     </section>
   );
 };

@@ -45,6 +45,14 @@ export interface CatBreed {
   reference_image_id?: string;
 }
 
+export interface CatImage {
+  id: string;
+  url: string;
+  width: number;
+  height: number;
+  [key: string]: any;
+}
+
 export interface DogBreed {
   id: number;
   name: string;

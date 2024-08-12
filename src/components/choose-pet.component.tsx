@@ -18,7 +18,7 @@ const ChoosePetBtn: React.FC<ChoosePetBtnProps> = ({
   return (
     <button
       onClick={handleChoosePet}
-      className="grid justify-items-center transform transition-transform duration-500 ease hover:scale-125 focus:scale-125 grayscale-[75%] hover:grayscale-0 focus:grayscale-0"
+      className="grid justify-items-center transform transition-transform duration-500 ease hover:scale-105 focus:scale-105 md:hover:scale-125 md:focus:scale-125 grayscale-[75%] hover:grayscale-0 focus:grayscale-0"
     >
       <Image
         src={img}
