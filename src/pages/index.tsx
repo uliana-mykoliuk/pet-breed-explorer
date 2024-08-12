@@ -1,193 +1,104 @@
-import Hero from "@/components/hero.component";
 import { useEffect, useState, useRef } from "react";
-import { fetchBreeds, fetchCatImageById } from "./api/cats";
-import { fetchDogBreeds, fetchDogImageById } from "./api/dogs";
+import Hero from "@/components/hero.component";
 import ChoosePet from "@/components/choose-pet.component";
 import CardList from "@/components/card-list.component";
+import { fetchBreeds, fetchCatImageById } from "./api/cats";
+import { fetchDogBreeds, fetchDogImageById } from "./api/dogs";
+import { Breed, CatBreed, DogBreed, PetType } from "@/types";
 
 export default function Home() {
-  const choosePetRef = useRef(null);
-  const cardListRef = useRef(null);
-  const [pet, setPet] = useState("");
-  const [catBreeds, setCatBreeds] = useState([]);
-  const [catImages, setCatImages] = useState({});
-  const [visibleCatBreeds, setVisibleCatBreeds] = useState(4);
-  const [dogBreeds, setDogBreeds] = useState([]);
-  const [dogImages, setDogImages] = useState({});
-  const [visibleDogBreeds, setVisibleDogBreeds] = useState(4);
+  const choosePetRef = useRef<HTMLDivElement>(null);
+  const cardListRef = useRef<HTMLDivElement>(null);
 
-  const getCatBreeds = async () => {
-    const breeds = await fetchBreeds();
-    setCatBreeds(breeds);
-  };
+  const [pet, setPet] = useState<PetType | "">("");
+  const [catBreeds, setCatBreeds] = useState<CatBreed[]>([]);
+  const [dogBreeds, setDogBreeds] = useState<DogBreed[]>([]);
+  const [catImages, setCatImages] = useState<{ [key: string]: string }>({});
+  const [dogImages, setDogImages] = useState<{ [key: string]: string }>({});
+  const [visibleBreeds, setVisibleBreeds] = useState<{
+    cat: number;
+    dog: number;
+  }>({ cat: 4, dog: 4 });
 
-  const getCatImages = async () => {
-    for (let breed of catBreeds) {
-      if (breed.reference_image_id) {
-        const image = await fetchCatImageById(breed.reference_image_id);
-        setCatImages((prevImages) => ({
-          ...prevImages,
-          [breed.id]: image?.url || "",
-        }));
-      }
-    }
-  };
-
-  const getDogBreeds = async () => {
-    const breeds = await fetchDogBreeds();
-    setDogBreeds(breeds);
-  };
-
-  const getDogImages = async () => {
-    for (let breed of dogBreeds) {
-      if (breed.reference_image_id) {
-        const image = await fetchDogImageById(breed.reference_image_id);
-        setDogImages((prevImages) => ({
-          ...prevImages,
-          [breed.id]: image?.url || "",
-        }));
-      }
+  const fetchData = async (type: PetType) => {
+    const fetchBreedsFunc = type === "cat" ? fetchBreeds : fetchDogBreeds;
+    const fetchImageFunc =
+      type === "cat" ? fetchCatImageById : fetchDogImageById;
+    const breeds = await fetchBreedsFunc();
+    const images = await Promise.all(
+      breeds.map(async (breed: Breed) => {
+        if (breed.reference_image_id) {
+          const image = await fetchImageFunc(breed.reference_image_id);
+          return { id: breed.id, url: image?.url || "" };
+        }
+        return { id: breed.id, url: "" };
+      })
+    );
+    if (type === "cat") {
+      setCatBreeds(breeds);
+      setCatImages(
+        images.reduce((acc, { id, url }) => ({ ...acc, [id]: url }), {})
+      );
+    } else {
+      setDogBreeds(breeds);
+      setDogImages(
+        images.reduce((acc, { id, url }) => ({ ...acc, [id]: url }), {})
+      );
     }
   };
 
   useEffect(() => {
     if (pet === "cat" && catBreeds.length === 0) {
-      getCatBreeds();
+      fetchData("cat");
+    } else if (pet === "dog" && dogBreeds.length === 0) {
+      fetchData("dog");
     }
-  }, [pet, dogBreeds]);
-
-  useEffect(() => {
-    if (pet === "dog" && dogBreeds.length === 0) {
-      getDogBreeds();
-    }
-  }, [pet, dogBreeds]);
-
-  useEffect(() => {
-    if (catBreeds.length > 0) {
-      getCatImages();
-    }
-  }, [catBreeds]);
-
-  useEffect(() => {
-    if (dogBreeds.length > 0) {
-      getDogImages();
-    }
-  }, [dogBreeds]);
+  }, [pet, catBreeds.length, dogBreeds.length]);
 
   useEffect(() => {
     if (pet) {
-      if (cardListRef.current) {
-        setTimeout(
-          () => cardListRef.current.scrollIntoView({ behavior: "smooth" }),
-          1000
-        );
-      }
+      setTimeout(() => {
+        cardListRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 1000);
     }
-  }, [pet, catBreeds, dogBreeds]);
+  }, [pet]);
 
   const handleScrollToChoosePet = () => {
-    choosePetRef.current.scrollIntoView({ behavior: "smooth" });
+    choosePetRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleLoadMoreCats = () => {
-    setVisibleCatBreeds((prev) => prev + 8);
+  const handleLoadMoreBreeds = (type: PetType) => {
+    setVisibleBreeds((prev) => ({ ...prev, [type]: prev[type] + 8 }));
   };
 
-  const handleLoadMoreDogs = () => {
-    setVisibleDogBreeds((prev) => prev + 8);
-  };
-
-  const handleChooseCat = () => {
-    setVisibleCatBreeds(4);
-    setPet("cat");
-  };
-
-  const handleChooseDog = () => {
-    setVisibleDogBreeds(4);
-    setPet("dog");
+  const handleChoosePet = (type: PetType) => {
+    setVisibleBreeds((prev) => ({ ...prev, [type]: 4 }));
+    setPet(type);
   };
 
   return (
     <>
       <Hero onBtnClick={handleScrollToChoosePet} />
-
-      {/* Dog or Cat ? */}
       <ChoosePet
         componentRef={choosePetRef}
-        handleChooseCat={handleChooseCat}
-        handleChooseDog={handleChooseDog}
+        handleChooseCat={() => handleChoosePet("cat")}
+        handleChooseDog={() => handleChoosePet("dog")}
       />
-      {/* Сat */}
-      {pet === "cat" && (
+      {pet && (
         <CardList
           componentRef={cardListRef}
-          title="Looking for a Cat?"
-          subtitle="Let's find out who is your future Mr. or Mrs. Meowster"
-          breeds={catBreeds}
-          visibleBreeds={visibleCatBreeds}
-          images={catImages}
-          handleLoadMorePets={handleLoadMoreCats}
+          title={`Looking for a ${pet === "cat" ? "Cat" : "Dog"}?`}
+          subtitle={`Let's find out who is your future Mr. or Mrs. ${
+            pet === "cat" ? "Meowster" : "Woofster"
+          }`}
+          breeds={pet === "cat" ? catBreeds : dogBreeds}
+          visibleBreeds={visibleBreeds[pet]}
+          images={pet === "cat" ? catImages : dogImages}
+          handleLoadMorePets={() => handleLoadMoreBreeds(pet)}
           petType={pet}
+          handleChangePet={(type: PetType) => handleChoosePet(type)}
         />
       )}
-
-      {/* Dog */}
-      {pet === "dog" && (
-        <CardList
-          componentRef={cardListRef}
-          title="Looking for a Dog?"
-          subtitle="Let's find out who is your future Mr. or Mrs. Woofster"
-          breeds={dogBreeds}
-          visibleBreeds={visibleDogBreeds}
-          images={dogImages}
-          handleLoadMorePets={handleLoadMoreDogs}
-          petType={pet}
-        />
-      )}
-
-      {/* <h2 className="text-center text-[48px] text-yellow-500 tracking-[1px]">
-        Looking for a Cat?
-      </h2>
-      <p className="mt-[12px] text-[24px] text-center mb-[50px]">
-        Let's find out who is your future Mr. or Mrs. Meowster
-      </p>
-      <div className="grid grid-cols-4 px-[80px] gap-[30px]">
-        {catBreeds.slice(0, visibleCatBreeds).map((cat) => (
-          <Card key={cat.id} name={cat.name} image={catImages[cat.id]} />
-        ))}
-      </div>
-      {visibleCatBreeds < catBreeds.length && (
-        <div className="flex justify-center mt-8 mb-[100px]">
-          <button
-            onClick={handleLoadMoreCats}
-            className="bg-yellow-500 text-white py-[12px] px-[64px] rounded-full mt-[30px]"
-          >
-            Load More
-          </button>
-        </div>
-      )} */}
-
-      {/* <h2 className="text-center text-[48px] text-yellow-500 tracking-[1px]">
-        Looking for a Dog?
-      </h2>
-      <p className="mt-[12px] text-[24px] text-center mb-[50px]">
-        Let's find out who is your future Mr. or Mrs. Woofster
-      </p>
-      <div className="grid grid-cols-4 px-[80px] gap-[30px]">
-        {dogBreeds.slice(0, visibleDogBreeds).map((dog) => (
-          <Card key={dog.id} name={dog.name} image={dogImages[dog.id]} />
-        ))}
-      </div>
-      {visibleDogBreeds < dogBreeds.length && (
-        <div className="flex justify-center mt-8 mb-[100px]">
-          <button
-            onClick={handleLoadMoreDogs}
-            className="bg-yellow-500 text-white py-[12px] px-[64px] rounded-full mt-[30px]"
-          >
-            Load More
-          </button>
-        </div>
-      )} */}
     </>
   );
 }

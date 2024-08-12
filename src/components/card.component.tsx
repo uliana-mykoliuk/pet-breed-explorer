@@ -21,8 +21,8 @@ const Card: React.FC<CardProps> = ({
       className="block w-full max-w-[320px] rounded-2xl bg-neutral-100 shadow-lg focus:outline-none"
     >
       <Image
-        alt={image === ImageNotFound ? "Image not available" : name}
-        src={image}
+        alt={!image ? "Image not available" : name}
+        src={image ? image : ImageNotFound}
         width={1000}
         height={1000}
         className="w-full h-36 md:h-48 object-cover rounded-t-2xl"

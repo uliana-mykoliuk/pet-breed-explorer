@@ -3,37 +3,38 @@ import { useEffect, useState } from "react";
 import { fetchCatBreedById, fetchCatImageById } from "../api/cats";
 import Image from "next/image";
 import Link from "next/link";
+import { CatBreed } from "@/types";
 
 const CatBreedPage = () => {
   const router = useRouter();
   const { id } = router.query;
-  const [breed, setBreed] = useState(null);
-  const [image, setImage] = useState(null);
+  const [breed, setBreed] = useState<CatBreed | null>(null);
+  const [image, setImage] = useState<string | null>(null);
+
+  const getBreedData = async () => {
+    if (id && typeof id === "string") {
+      try {
+        const breedData = await fetchCatBreedById(id);
+        setBreed(breedData);
+
+        if (breedData?.reference_image_id) {
+          const imageData = await fetchCatImageById(
+            breedData.reference_image_id
+          );
+          setImage(imageData?.url || null);
+        }
+      } catch (error) {
+        console.error("Error fetching cat breed data:", error);
+      }
+    }
+  };
 
   useEffect(() => {
-    const getBreedData = async () => {
-      if (id) {
-        try {
-          const breedData = await fetchCatBreedById(id);
-          setBreed(breedData);
-
-          if (breedData?.reference_image_id) {
-            const imageData = await fetchCatImageById(
-              breedData.reference_image_id
-            );
-            setImage(imageData?.url || null);
-          }
-        } catch (error) {
-          console.error("Error fetching cat breed data:", error);
-        }
-      }
-    };
-
     getBreedData();
   }, [id]);
 
   if (!breed) {
-    return <div>Loading...</div>;
+    return <div className="text-center">Loading...</div>;
   }
 
   const progressBars = [
@@ -52,64 +53,78 @@ const CatBreedPage = () => {
   ];
 
   return (
-    <section className="py-[50px] px-[80px] min-h-screen grid content-center">
-      <Link href="/" className="absolute top-[50px] left-[80px]">
-        &larr; &nbsp;Back to Home
-      </Link>
-      <h1 className="text-center text-[48px] text-yellow-500 tracking-[1px] mb-[30px]">
-        Learn more about this kitty
-      </h1>
-      <div className="grid grid-cols-2 gap-[50px]">
+    <section className="px-6 py-6 sm:px-12 md:px-24 md:py-12 min-h-screen grid content-center">
+      <div className="grid md:grid-cols-5 gap-4 mb-4 md:mb-8">
+        <Link href="/" className="md:col-span-2 text-blue-500">
+          &larr; Back to Home
+        </Link>
+        <h1 className="md:col-span-3 text-center text-3xl lg:text-5xl text-yellow-500 tracking-wide">
+          Learn More About This Kitty
+        </h1>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-12">
         {image && (
           <Image
             src={image}
-            alt={breed.name}
+            alt={breed.name || "Cat Image"}
             width={1000}
             height={1000}
-            className="w-full h-full object-cover"
+            className="max-w-[400px] max-h-[50vh] md:max-h-none md:max-w-none w-full h-full object-cover justify-self-center"
           />
         )}
-        <div className="grid gap-[5px] content-start">
-          <h2 className="text-[36px] text-green-900 tracking-[1px] leading-[40px] mb-[10px]">
-            {breed.name}
-          </h2>
-          <p className="tracking-[1px]">
-            <span className="text-green-900 font-bold">Origin: &nbsp;</span>
-            {breed.origin}
-          </p>
-          <p className="tracking-[1px]">
-            <span className="text-green-900 font-bold">Life span: &nbsp;</span>
-            {breed.life_span} years
-          </p>
-          <p className="tracking-[1px]">
-            <span className="text-green-900 font-bold">Weight: &nbsp;</span>
-            imperial ({breed.weight.imperial})/ metric ({breed.weight.metric})
-          </p>
-          <p className="tracking-[1px]">
-            <span className="text-green-900 font-bold">
-              Temperament: &nbsp;
-            </span>
-            {breed.temperament}
-          </p>
+        <div className="space-y-2 md:space-y-4">
+          {breed.name && (
+            <h2 className="text-2xl md:text-4xl text-green-900 tracking-wide leading-snug mb-2">
+              {breed.name}
+            </h2>
+          )}
+          {breed.origin && (
+            <p className="text-sm md:text-base">
+              <span className="font-bold text-green-900">Origin:</span>{" "}
+              {breed.origin}
+            </p>
+          )}
+          {breed.life_span && (
+            <p className="text-sm md:text-base">
+              <span className="font-bold text-green-900">Life Span:</span>{" "}
+              {breed.life_span} years
+            </p>
+          )}
+          {breed.weight && (
+            <p className="text-sm md:text-base">
+              <span className="font-bold text-green-900">Weight:</span> Imperial
+              ({breed.weight.imperial}) / Metric ({breed.weight.metric})
+            </p>
+          )}
+          {breed.temperament && (
+            <p className="text-sm md:text-base">
+              <span className="font-bold text-green-900">Temperament:</span>{" "}
+              {breed.temperament}
+            </p>
+          )}
 
-          {/* Progress Bars */}
-          <div className="grid gap-y-[8px] gap-x-[20px] grid-cols-2">
-            {progressBars.map((bar, index) => (
-              <div key={index}>
-                <label className="text-green-900 font-bold tracking-[1px]">
-                  {bar.label}:
-                </label>
-                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                  <div
-                    className="bg-yellow-500 h-full"
-                    style={{ width: `${(bar.value / 5) * 100}%` }}
-                  />
+          <div className="grid gap-2 grid-cols-2">
+            {progressBars.map((bar) =>
+              bar.value != null ? (
+                <div key={bar.label}>
+                  <label className="font-bold text-green-900 text-sm md:text-base">
+                    {bar.label}:
+                  </label>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-yellow-500 h-full"
+                      style={{ width: `${(bar.value / 5) * 100}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ) : null
+            )}
           </div>
 
-          <p className="tracking-[1px] mt-[20px]">{breed.description}</p>
+          {breed.description && (
+            <p className="text-sm md:text-base mt-4">{breed.description}</p>
+          )}
         </div>
       </div>
     </section>
