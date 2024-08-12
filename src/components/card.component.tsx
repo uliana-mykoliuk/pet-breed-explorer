@@ -18,7 +18,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <Link
       href={`${pet}/${id}`}
-      className="block w-full rounded-2xl bg-neutral-100 shadow-lg focus:outline-none"
+      className="block w-full max-w-[320px] rounded-2xl bg-neutral-100 shadow-lg focus:outline-none"
     >
       <Image
         alt={image === ImageNotFound ? "Image not available" : name}

@@ -43,7 +43,7 @@ const ChoosePet: React.FC<ChoosePetProps> = ({
   return (
     <div
       ref={componentRef}
-      className="min-h-screen flex flex-col justify-center py-12 px-6 sm:px-12 md:px-24"
+      className="min-h-screen flex flex-col justify-center py-6 md:py-12 px-6 sm:px-12 md:px-24"
     >
       <h2 className="text-center text-3xl md:text-5xl text-yellow-500 tracking-wide">
         Are you a Cat or Dog person?
