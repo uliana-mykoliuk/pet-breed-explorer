@@ -14,7 +14,7 @@ export const fetchBreeds = async () => {
   }
 };
 
-export const fetchCatImageById = async (imageId) => {
+export const fetchCatImageById = async (imageId: string) => {
   try {
     const response = await axios.get(
       `https://api.thecatapi.com/v1/images/${imageId}`,
@@ -31,7 +31,7 @@ export const fetchCatImageById = async (imageId) => {
   }
 };
 
-export const fetchCatBreedById = async (id) => {
+export const fetchCatBreedById = async (id: string) => {
   try {
     const response = await axios.get(
       `https://api.thecatapi.com/v1/breeds/${id}`,
