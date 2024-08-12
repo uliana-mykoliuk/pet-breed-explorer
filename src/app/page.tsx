@@ -1,9 +1,10 @@
+"use client";
 import { useEffect, useState, useRef } from "react";
 import Hero from "@/components/hero.component";
 import ChoosePet from "@/components/choose-pet.component";
 import CardList from "@/components/card-list.component";
-import { fetchBreeds, fetchCatImageById } from "./api/cats";
-import { fetchDogBreeds, fetchDogImageById } from "./api/dogs";
+import { fetchBreeds, fetchCatImageById } from "@/api/cats";
+import { fetchDogBreeds, fetchDogImageById } from "@/api/dogs";
 import { Breed, CatBreed, DogBreed, PetType } from "@/types";
 
 export default function Home() {

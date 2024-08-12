@@ -1,13 +1,12 @@
-import { useRouter } from "next/router";
+"use client";
 import { useEffect, useState } from "react";
-import { fetchCatBreedById, fetchCatImageById } from "../api/cats";
+import { fetchCatBreedById, fetchCatImageById } from "@/api/cats";
 import Image from "next/image";
 import Link from "next/link";
 import { CatBreed } from "@/types";
 
-const CatBreedPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
+const CatBreedPage = ({ params }: { params: { id: string } }) => {
+  const { id } = params;
   const [breed, setBreed] = useState<CatBreed | null>(null);
   const [image, setImage] = useState<string | null>(null);
 

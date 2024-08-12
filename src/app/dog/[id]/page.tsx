@@ -1,13 +1,12 @@
-import { useRouter } from "next/router";
+"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchDogBreedById, fetchDogImageById } from "../api/dogs";
+import { fetchDogBreedById, fetchDogImageById } from "@/api/dogs";
 import { DogBreed } from "@/types";
 
-const DogBreedPage = () => {
-  const router = useRouter();
-  const { id } = router.query;
+const DogBreedPage = ({ params }: { params: { id: string } }) => {
+  const { id } = params;
   const [breed, setBreed] = useState<DogBreed | null>(null);
   const [image, setImage] = useState<string | null>(null);
 
