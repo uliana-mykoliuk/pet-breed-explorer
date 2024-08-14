@@ -1,31 +1,60 @@
+import { useEffect, useState } from "react";
 import Card from "./card.component";
 import { Breed, PetType } from "@/types";
+import { fetchBreeds, fetchCatImageById } from "@/app/api/cats";
+import { fetchDogBreeds, fetchDogImageById } from "@/app/api/dogs";
 
 interface CardListProps {
   title: string;
   subtitle: string;
-  breeds: Breed[];
-  visibleBreeds: number;
-  images: { [key: string]: string };
-  handleLoadMorePets: () => void;
-  handleChangePet: (type: PetType) => void;
-  componentRef: React.RefObject<HTMLDivElement>;
   petType: PetType;
+  handleChangePet: (type: PetType) => void;
 }
 
 const CardList: React.FC<CardListProps> = ({
   title,
   subtitle,
-  breeds,
-  visibleBreeds,
-  images,
-  handleLoadMorePets,
-  handleChangePet,
-  componentRef,
   petType,
+  handleChangePet,
 }) => {
+  const [breeds, setBreeds] = useState<Breed[]>([]);
+  const [images, setImages] = useState<{ [key: string]: string }>({});
+  const [visibleBreeds, setVisibleBreeds] = useState<number>(4);
+
+  const fetchData = async () => {
+    const fetchBreedsFunc = petType === "cat" ? fetchBreeds : fetchDogBreeds;
+    const fetchImageFunc =
+      petType === "cat" ? fetchCatImageById : fetchDogImageById;
+    const breedsData = await fetchBreedsFunc();
+    const imagesData = await Promise.all(
+      breedsData.map(async (breed: Breed) => {
+        if (breed.reference_image_id) {
+          const image = await fetchImageFunc(breed.reference_image_id);
+          return { id: breed.id, url: image?.url || "" };
+        }
+        return { id: breed.id, url: "" };
+      })
+    );
+    setBreeds(breedsData);
+    setImages(
+      imagesData.reduce((acc, { id, url }) => ({ ...acc, [id]: url }), {})
+    );
+  };
+
+  useEffect(() => {
+    fetchData();
+    setVisibleBreeds(4);
+  }, [petType]);
+
+  const handleLoadMoreBreeds = () => {
+    setVisibleBreeds((prev) => prev + 8);
+  };
+
   return (
-    <div ref={componentRef} className="px-6 py-6 sm:px-12 md:px-24 md:py-12">
+    <div
+      id="card-list"
+      className="px-6 py-6 sm:px-12 md:px-24 md:py-12 min-h-screen flex flex-col justify-center"
+    >
       <h2 className="text-center text-3xl md:text-5xl text-yellow-500 tracking-wide">
         {title}
       </h2>
@@ -47,7 +76,7 @@ const CardList: React.FC<CardListProps> = ({
       <div className="flex flex-wrap justify-center mt-4 md:mt-8">
         {visibleBreeds < breeds.length && (
           <button
-            onClick={handleLoadMorePets}
+            onClick={handleLoadMoreBreeds}
             className="duration-500 ease font-rowdies px-8 py-1.5 mt-4 text-white bg-yellow-500 hover:bg-yellow-700 focus:bg-yellow-700 rounded-full md:px-16 md:py-3 md:mt-8"
           >
             Load More

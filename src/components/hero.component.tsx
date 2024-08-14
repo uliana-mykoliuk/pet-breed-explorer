@@ -1,11 +1,8 @@
 import Image from "next/image";
 import HeroDogBg from "@/assets/hero-dog-bg.jpg";
+import Link from "next/link";
 
-interface HeroProps {
-  onBtnClick: () => void;
-}
-
-const Hero: React.FC<HeroProps> = ({ onBtnClick }) => {
+const Hero = () => {
   return (
     <main className="flex items-center min-h-screen bg-neutral-50 py-6 py-12 px-6 sm:px-12 md:px-24">
       <div className="flex flex-col items-center md:flex-row">
@@ -25,12 +22,12 @@ const Hero: React.FC<HeroProps> = ({ onBtnClick }) => {
             If you are not sure what your future friend looks like, we are glad
             to help you discover.
           </p>
-          <button
-            onClick={onBtnClick}
-            className="duration-500 ease hover:bg-yellow-700 focus:bg-yellow-700 font-rowdies mt-4 rounded-full bg-yellow-500 text-white text-sm py-1.5 px-4 md:mt-8 md:text-base md:py-3 md:px-6"
+          <Link
+            href="#choose-pet"
+            className="inline-block duration-500 ease hover:bg-yellow-700 focus:bg-yellow-700 font-rowdies mt-4 rounded-full bg-yellow-500 text-white text-sm py-1.5 px-4 md:mt-8 md:text-base md:py-3 md:px-6"
           >
             Let's have a look
-          </button>
+          </Link>
         </div>
       </div>
     </main>

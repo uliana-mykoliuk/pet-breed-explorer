@@ -1,6 +1,7 @@
 import Image, { StaticImageData } from "next/image";
 import CatImg from "@/assets/cat-choise.jpg";
 import DogImg from "@/assets/dog-choise.jpg";
+import Link from "next/link";
 
 interface ChoosePetBtnProps {
   img: StaticImageData;
@@ -16,7 +17,8 @@ const ChoosePetBtn: React.FC<ChoosePetBtnProps> = ({
   text,
 }) => {
   return (
-    <button
+    <Link
+      href="#card-list"
       onClick={handleChoosePet}
       className="grid justify-items-center transform transition-transform duration-500 ease hover:scale-105 focus:scale-105 md:hover:scale-125 md:focus:scale-125 grayscale-[75%] hover:grayscale-0 focus:grayscale-0"
     >
@@ -31,24 +33,22 @@ const ChoosePetBtn: React.FC<ChoosePetBtnProps> = ({
       <p className="mt-2 md:mt-4 text-sm md:text-base font-rowdies text-center text-yellow-500">
         Click Me!
       </p>
-    </button>
+    </Link>
   );
 };
 
 interface ChoosePetProps {
   handleChooseCat: () => void;
   handleChooseDog: () => void;
-  componentRef: React.RefObject<HTMLDivElement>;
 }
 
 const ChoosePet: React.FC<ChoosePetProps> = ({
   handleChooseCat,
   handleChooseDog,
-  componentRef,
 }) => {
   return (
     <div
-      ref={componentRef}
+      id="choose-pet"
       className="min-h-screen flex flex-col justify-center py-6 md:py-12 px-6 sm:px-12 md:px-24"
     >
       <h2 className="text-center text-3xl md:text-5xl text-yellow-500 tracking-wide">
